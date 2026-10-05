@@ -1,12 +1,5 @@
-import { iconifyBatchUrls, iconifySvg } from "./iconify";
-import {
-    ICONIFY_HOST,
-    ICONIFY_PREFIXES,
-    LUCIDE_ICON_BASE,
-    LUCIDE_INDEX_URL,
-    SIMPLE_ICONS_ICON_BASE,
-    SIMPLE_ICONS_INDEX_URL,
-} from "./sources";
+import { LUCIDE_CATEGORIES } from "./lucide-categories";
+import { LUCIDE_ICON_BASE, LUCIDE_INDEX_URL } from "./sources";
 
 export const WEBVIEW_HTML = `<!doctype html>
 <html>
@@ -37,36 +30,6 @@ header {
     color: var(--drawdy-muted-foreground, #888);
     margin: 0 0 8px;
     line-height: 1.45;
-}
-.tabs {
-    display: flex;
-    gap: 2px;
-    padding: 3px;
-    margin: 0 0 8px;
-    background: var(--drawdy-surface, #f4f4f4);
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: var(--drawdy-radius-md, 8px);
-}
-.tab {
-    flex: 1;
-    min-width: 0;
-    padding: 5px 4px;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--drawdy-muted-foreground, #888);
-    background: transparent;
-    border: 0;
-    border-radius: var(--drawdy-radius-sm, 6px);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.1s, color 0.1s;
-}
-.tab:hover { color: var(--drawdy-foreground, #111); }
-.tab.active {
-    background: var(--drawdy-background, #fff);
-    color: var(--drawdy-foreground, #111);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .options {
     display: flex;
@@ -105,7 +68,6 @@ header {
     align-items: center;
     gap: 5px;
 }
-.swatches.disabled { opacity: 0.35; }
 .swatch {
     position: relative;
     width: 18px;
@@ -118,7 +80,6 @@ header {
     cursor: pointer;
     overflow: hidden;
 }
-.swatch:disabled { cursor: default; }
 .swatch.ink { background: var(--drawdy-foreground, #111); }
 .swatch.custom {
     display: inline-block;
@@ -165,7 +126,7 @@ header {
 .chips {
     display: flex;
     gap: 4px;
-    margin: 8px 0 0;
+    margin: 0 0 8px;
     padding: 0 0 2px;
     overflow-x: auto;
     scrollbar-width: thin;
@@ -238,8 +199,6 @@ main {
 .tile:active { cursor: grabbing; transform: scale(0.94); }
 .tile:focus-visible { outline: 2px solid var(--drawdy-ring, #6366f1); outline-offset: 1px; }
 .tile.dragging { opacity: 0.35; }
-.tile.brand { background: #fff; }
-.tile.brand:hover { background: #fff; }
 .tile svg { width: 22px; height: 22px; display: block; }
 .skeleton {
     width: 20px;
@@ -313,19 +272,11 @@ main {
     opacity: 0.9;
 }
 .ghost svg { width: 20px; height: 20px; display: block; }
-.ghost.brand { background: #fff; }
 </style>
 </head>
 <body>
 <header>
     <p class="hint">Drag an icon onto the board, or click to add it at the centre.</p>
-    <div class="tabs" id="tabs">
-        <button class="tab" type="button" data-tab="icons">Icons</button>
-        <button class="tab" type="button" data-tab="brands">Brands</button>
-        <button class="tab" type="button" data-tab="tech">Tech</button>
-        <button class="tab" type="button" data-tab="emoji">Emoji</button>
-        <button class="tab" type="button" data-tab="flags">Flags</button>
-    </div>
     <div class="options">
         <div class="seg" id="sizes" title="Size on the board">
             <button type="button" data-size="32" title="32 px">S</button>
@@ -347,10 +298,9 @@ main {
             <button type="button" class="swatch" data-color="#ff4d4d" style="--swatch: #ff4d4d" title="#ff4d4d" aria-label="#ff4d4d"></button>
             <label class="swatch custom" id="custom-swatch" title="Custom colour"><input type="color" id="custom-color" value="#000000" aria-label="Custom colour" /></label>
         </div>
-        <label class="check" id="brand-wrap"><input type="checkbox" id="brand-colours" /> Brand colours</label>
     </div>
-    <input id="search" type="text" placeholder="Search icons" autocomplete="off" />
-    <div class="chips" id="chips" hidden></div>
+    <div class="chips" id="chips"></div>
+    <input id="search" type="text" placeholder="Search icons (home, arrow…)" autocomplete="off" />
 </header>
 <div class="recent-wrap" id="recent-wrap" hidden>
     <div class="section-label">Recent</div>
@@ -368,66 +318,28 @@ main {
 
     var LUCIDE_INDEX_URL = "${LUCIDE_INDEX_URL}";
     var LUCIDE_ICON_BASE = "${LUCIDE_ICON_BASE}";
-    var BRAND_INDEX_URL = "${SIMPLE_ICONS_INDEX_URL}";
-    var BRAND_ICON_BASE = "${SIMPLE_ICONS_ICON_BASE}";
-    var ICONIFY_HOST = "${ICONIFY_HOST}";
-    var ICONIFY_PREFIXES = ${JSON.stringify(ICONIFY_PREFIXES)};
-    var iconifyBatchUrls = (${iconifyBatchUrls.toString()});
-    var iconifySvg = (${iconifySvg.toString()});
+    var CATEGORIES = ${JSON.stringify(LUCIDE_CATEGORIES)};
 
-    var TABS = ["icons", "brands", "tech", "emoji", "flags"];
-    var PLACEHOLDERS = {
-        icons: "Search icons (home, arrow…)",
-        brands: "Search brands (figma, slack…)",
-        tech: "Search tech logos (aws, react…)",
-        emoji: "Search emoji (smile, heart…)",
-        flags: "Search flags (japan, th…)",
-    };
-    var EMOJI_CATEGORIES = [
-        "Smileys & Emotion",
-        "People & Body",
-        "Animals & Nature",
-        "Food & Drink",
-        "Travel & Places",
-        "Activities",
-        "Objects",
-        "Symbols",
-        "Flags",
-    ];
-    var ALL_CATEGORIES = "All";
-    var TONE_SUFFIXES = ["-medium-light", "-medium-dark", "-light", "-medium", "-dark"];
     var PRESET_COLORS = ["#b3e000", "#ffab3c", "#698CF9", "#ff4d4d"];
     var PAGE_SIZE = 120;
     var SEARCH_DEBOUNCE_MS = 120;
     var RECENT_LIMIT = 12;
     var DRAG_THRESHOLD = 5;
-    var BATCH_DELAY_MS = 30;
-    var MAX_BATCHES_IN_FLIGHT = 2;
 
-    var tab = "icons";
     var query = "";
-    var category = ALL_CATEGORIES;
+    var category = null;
     var limit = PAGE_SIZE;
     var shown = [];
     var recent = [];
-    var options = { size: 64, color: "ink", brandColours: true, stroke: 2, label: false };
+    var options = { size: 64, color: "ink", stroke: 2, label: false };
 
-    var catalog = { icons: null, brands: null, tech: null, emoji: null, flags: null };
-    var loadState = { icons: "idle", brands: "idle", tech: "idle", emoji: "idle", flags: "idle" };
+    var catalog = null;
+    var categoryEntries = {};
+    var loadState = "idle";
     var svgCache = new Map();
     var svgPending = new Map();
     var svgFailed = new Set();
-    var batchQueue = new Map();
-    var batchTimer = null;
-    var iconifyJobs = [];
-    var iconifyActive = 0;
     var searchTimer = null;
-    var regionNames = null;
-    try {
-        regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-    } catch (error) {
-        regionNames = null;
-    }
 
     var themeStyle = document.getElementById("theme");
     var mainEl = document.getElementById("main");
@@ -439,16 +351,11 @@ main {
     var recentWrap = document.getElementById("recent-wrap");
     var searchEl = document.getElementById("search");
     var chipsEl = document.getElementById("chips");
-    var tabButtons = Array.prototype.slice.call(document.querySelectorAll("[data-tab]"));
     var sizeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-size]"));
     var strokeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-stroke]"));
     var colorButtons = Array.prototype.slice.call(document.querySelectorAll("[data-color]"));
-    var strokesEl = document.getElementById("strokes");
-    var colorsEl = document.getElementById("colors");
     var customSwatch = document.getElementById("custom-swatch");
     var customInput = document.getElementById("custom-color");
-    var brandWrap = document.getElementById("brand-wrap");
-    var brandInput = document.getElementById("brand-colours");
     var labelInput = document.getElementById("label");
 
     var observer = new IntersectionObserver(
@@ -483,90 +390,7 @@ main {
     }
 
     function iconUrl(icon) {
-        var base = icon.source === "lucide" ? LUCIDE_ICON_BASE : BRAND_ICON_BASE;
-        return base + encodeURIComponent(icon.name) + ".svg";
-    }
-
-    function queueIconify(icon) {
-        var parts = icon.name.split(":");
-        return new Promise(function (resolve, reject) {
-            var waiters = batchQueue.get(parts[0]);
-            if (!waiters) {
-                waiters = [];
-                batchQueue.set(parts[0], waiters);
-            }
-            waiters.push({ name: parts[1], resolve: resolve, reject: reject });
-            if (batchTimer !== null) clearTimeout(batchTimer);
-            batchTimer = setTimeout(flushIconify, BATCH_DELAY_MS);
-        });
-    }
-
-    function flushIconify() {
-        batchTimer = null;
-        var queued = batchQueue;
-        batchQueue = new Map();
-        queued.forEach(function (waiters, prefix) {
-            var names = waiters.map(function (waiter) {
-                return waiter.name;
-            });
-            var offset = 0;
-            iconifyBatchUrls(ICONIFY_HOST, prefix, names).forEach(function (batch) {
-                var batchWaiters = waiters.slice(offset, offset + batch.names.length);
-                offset += batch.names.length;
-                queueIconifyJob(function () {
-                    return loadIconifyBatch(prefix, batch.url, batchWaiters);
-                });
-            });
-        });
-    }
-
-    function queueIconifyJob(job) {
-        iconifyJobs.push(job);
-        pumpIconifyJobs();
-    }
-
-    function pumpIconifyJobs() {
-        while (iconifyActive < MAX_BATCHES_IN_FLIGHT && iconifyJobs.length > 0) {
-            var job = iconifyJobs.shift();
-            iconifyActive++;
-            job().then(finishIconifyJob, finishIconifyJob);
-        }
-    }
-
-    function finishIconifyJob() {
-        iconifyActive--;
-        pumpIconifyJobs();
-    }
-
-    function loadIconifyBatch(prefix, url, waiters) {
-        return request(url, readJson).then(
-            function (data) {
-                waiters.forEach(function (waiter) {
-                    var svg = iconifySvg(data, waiter.name);
-                    if (svg !== null) {
-                        waiter.resolve(svg);
-                        return;
-                    }
-                    queueIconifyJob(function () {
-                        return request(ICONIFY_HOST + "/" + prefix + "/" + waiter.name + ".svg", readText).then(
-                            waiter.resolve,
-                            waiter.reject
-                        );
-                    });
-                });
-            },
-            function (error) {
-                waiters.forEach(function (waiter) {
-                    waiter.reject(error);
-                });
-            }
-        );
-    }
-
-    function catalogUrl(which) {
-        if (which === "icons") return LUCIDE_INDEX_URL;
-        if (which === "brands") return BRAND_INDEX_URL;
-        return ICONIFY_HOST + "/collection?prefix=" + encodeURIComponent(ICONIFY_PREFIXES[which]);
+        return LUCIDE_ICON_BASE + encodeURIComponent(icon.name) + ".svg";
     }
 
     function sanitizeSvg(text) {
@@ -582,11 +406,7 @@ main {
         var inflight = svgPending.get(key);
         if (inflight) return inflight;
         if (svgFailed.has(key)) return Promise.reject(new Error("failed earlier"));
-        var fetched =
-            icon.source === "iconify"
-                ? queueIconify(icon)
-                : request(iconUrl(icon), readText);
-        var promise = fetched
+        var promise = request(iconUrl(icon), readText)
             .then(function (text) {
                 var clean = sanitizeSvg(text);
                 svgCache.set(key, clean);
@@ -595,22 +415,19 @@ main {
             })
             .catch(function (error) {
                 svgPending.delete(key);
-                if (icon.source === "iconify") svgFailed.add(key);
+                svgFailed.add(key);
                 throw error;
             });
         svgPending.set(key, promise);
         return promise;
     }
 
-    function paintSvg(container, icon, svgText) {
+    function paintSvg(container, svgText) {
         container.innerHTML = svgText;
         var node = container.querySelector("svg");
         if (!node) return;
         node.removeAttribute("width");
         node.removeAttribute("height");
-        if (icon.source === "brand" && icon.hex) {
-            node.setAttribute("fill", "#" + icon.hex);
-        }
     }
 
     function fillTile(tile) {
@@ -619,7 +436,7 @@ main {
         loadSvg(icon).then(
             function (svgText) {
                 if (!tile.isConnected) return;
-                paintSvg(tile, icon, svgText);
+                paintSvg(tile, svgText);
             },
             function () {
                 if (!tile.isConnected) return;
@@ -646,10 +463,10 @@ main {
 
     function makeGhost(icon) {
         var ghost = document.createElement("div");
-        ghost.className = icon.source === "brand" ? "ghost brand" : "ghost";
+        ghost.className = "ghost";
         document.body.appendChild(ghost);
         var cached = svgCache.get(keyOf(icon));
-        if (cached) paintSvg(ghost, icon, cached);
+        if (cached) paintSvg(ghost, cached);
         return ghost;
     }
 
@@ -664,7 +481,6 @@ main {
             name: icon.name,
             title: icon.title,
         };
-        if (icon.hex) ref.hex = icon.hex;
         var key = keyOf(ref);
         recent = recent.filter(function (entry) {
             return keyOf(entry) !== key;
@@ -676,7 +492,7 @@ main {
     }
 
     function persist() {
-        api.postMessage({ type: "persist", tab: tab, recent: recent, options: options });
+        api.postMessage({ type: "persist", recent: recent, options: options });
     }
 
     function send(icon, point) {
@@ -687,7 +503,6 @@ main {
                 title: icon.title,
                 svg: svgText,
             };
-            if (icon.hex) payload.hex = icon.hex;
             if (point) {
                 api.postMessage({
                     type: "drop-icon",
@@ -705,14 +520,14 @@ main {
     function makeTile(icon, eager) {
         var tile = document.createElement("button");
         tile.type = "button";
-        tile.className = icon.source === "brand" ? "tile brand" : "tile";
+        tile.className = "tile";
         tile.title = icon.title;
         tile.setAttribute("aria-label", icon.title);
         tile.iconRef = icon;
 
         var cached = svgCache.get(keyOf(icon));
         if (cached) {
-            paintSvg(tile, icon, cached);
+            paintSvg(tile, cached);
         } else if (svgFailed.has(keyOf(icon))) {
             markFailed(tile);
         } else {
@@ -786,195 +601,73 @@ main {
         return tile;
     }
 
-    function prettify(name) {
-        var spaced = name.replace(/-/g, " ");
-        return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-    }
-
-    function flagTitle(name) {
-        if (name.length === 2 && regionNames) {
-            try {
-                var region = regionNames.of(name.toUpperCase());
-                if (region) return region;
-            } catch (error) {}
-        }
-        return prettify(name);
-    }
-
-    function makeEntry(source, name, short, title, extra) {
-        var nameKey = short.toLowerCase();
-        var titleKey = title.toLowerCase();
+    function makeEntry(name, tags) {
+        var nameKey = name.toLowerCase();
         return {
-            source: source,
+            source: "lucide",
             name: name,
-            title: title,
+            title: name,
             nameKey: nameKey,
-            titleKey: titleKey,
-            words: (nameKey + " " + titleKey).split(/[\\s-]+/),
-            search: nameKey + " " + titleKey + " " + extra.toLowerCase(),
+            words: nameKey.split("-"),
+            search: nameKey + " " + nameKey.replace(/-/g, " ") + " " + tags.join(" ").toLowerCase(),
         };
     }
 
-    function byTitle(a, b) {
-        if (a.titleKey < b.titleKey) return -1;
-        return a.titleKey > b.titleKey ? 1 : 0;
+    function byName(a, b) {
+        if (a.nameKey < b.nameKey) return -1;
+        return a.nameKey > b.nameKey ? 1 : 0;
     }
 
-    function buildLucide(data) {
+    function buildCatalog(data) {
         var names = Object.keys(data).sort();
-        var out = [];
+        var entries = new Map();
+        catalog = [];
         for (var i = 0; i < names.length; i++) {
-            var name = names[i];
-            var tags = Array.isArray(data[name]) ? data[name] : [];
-            out.push(makeEntry("lucide", name, name, name, name.replace(/-/g, " ") + " " + tags.join(" ")));
+            var tags = Array.isArray(data[names[i]]) ? data[names[i]] : [];
+            var entry = makeEntry(names[i], tags);
+            catalog.push(entry);
+            entries.set(names[i], entry);
         }
-        return out;
-    }
-
-    function buildBrands(data) {
-        var list = Array.isArray(data) ? data : data && data.icons;
-        if (!Array.isArray(list)) return [];
-        var out = [];
-        for (var i = 0; i < list.length; i++) {
-            var entry = list[i];
-            if (!entry || typeof entry.title !== "string") continue;
-            var slug = typeof entry.slug === "string" ? entry.slug : slugify(entry.title);
-            var aliases = [];
-            if (entry.aliases && Array.isArray(entry.aliases.aka)) {
-                aliases = entry.aliases.aka;
+        categoryEntries = {};
+        for (var c = 0; c < CATEGORIES.length; c++) {
+            var icons = CATEGORIES[c].icons;
+            var list = [];
+            for (var n = 0; n < icons.length; n++) {
+                if (entries.has(icons[n])) list.push(entries.get(icons[n]));
             }
-            var brand = makeEntry("brand", slug, slug, entry.title, aliases.join(" "));
-            if (typeof entry.hex === "string") brand.hex = entry.hex;
-            out.push(brand);
+            categoryEntries[CATEGORIES[c].id] = list;
         }
-        out.sort(byTitle);
-        return out;
     }
 
-    function slugify(title) {
-        return title
-            .toLowerCase()
-            .replace(/\\+/g, "plus")
-            .replace(/\\./g, "dot")
-            .replace(/&/g, "and")
-            .replace(/đ/g, "d")
-            .replace(/ħ/g, "h")
-            .replace(/ı/g, "i")
-            .replace(/ĸ/g, "k")
-            .replace(/ŀ/g, "l")
-            .replace(/ł/g, "l")
-            .replace(/ß/g, "ss")
-            .replace(/ŧ/g, "t")
-            .normalize("NFD")
-            .replace(/[\\u0300-\\u036f]/g, "")
-            .replace(/[^a-z0-9]/g, "");
-    }
-
-    function collectionNames(data) {
-        var seen = new Set();
-        var out = [];
-        function add(list, group) {
-            if (!Array.isArray(list)) return;
-            for (var i = 0; i < list.length; i++) {
-                var name = list[i];
-                if (typeof name !== "string" || seen.has(name)) continue;
-                seen.add(name);
-                out.push({ name: name, category: group });
-            }
-        }
-        if (!data || typeof data !== "object") return out;
-        add(data.uncategorized, null);
-        if (data.categories && typeof data.categories === "object") {
-            for (var group in data.categories) {
-                add(data.categories[group], group);
-            }
-        }
-        return out;
-    }
-
-    function isToneVariant(name, names) {
-        for (var i = 0; i < TONE_SUFFIXES.length; i++) {
-            var suffix = TONE_SUFFIXES[i];
-            if (name.length > suffix.length && name.slice(-suffix.length) === suffix) {
-                return names.has(name.slice(0, -suffix.length));
-            }
-        }
-        return false;
-    }
-
-    function categoryRank(group) {
-        var rank = EMOJI_CATEGORIES.indexOf(group);
-        return rank === -1 ? EMOJI_CATEGORIES.length : rank;
-    }
-
-    function buildIconify(which, data) {
-        var prefix = ICONIFY_PREFIXES[which];
-        var listed = collectionNames(data);
-        var names = new Set(listed.map(function (entry) {
-            return entry.name;
-        }));
-        var out = [];
-        for (var i = 0; i < listed.length; i++) {
-            var name = listed[i].name;
-            if (which === "emoji" && isToneVariant(name, names)) continue;
-            var title = which === "flags" ? flagTitle(name) : prettify(name);
-            var entry = makeEntry("iconify", prefix + ":" + name, name, title, name.replace(/-/g, " "));
-            entry.category = listed[i].category;
-            out.push(entry);
-        }
-        if (which === "emoji") {
-            out.sort(function (a, b) {
-                var rank = categoryRank(a.category) - categoryRank(b.category);
-                if (rank !== 0) return rank;
-                if (a.nameKey < b.nameKey) return -1;
-                return a.nameKey > b.nameKey ? 1 : 0;
-            });
-        } else {
-            out.sort(byTitle);
-        }
-        return out;
-    }
-
-    function buildCatalog(which, data) {
-        if (which === "icons") return buildLucide(data);
-        if (which === "brands") return buildBrands(data);
-        return buildIconify(which, data);
-    }
-
-    function loadCatalog(which) {
-        if (loadState[which] === "loading" || loadState[which] === "ready") return;
-        loadState[which] = "loading";
-        render();
-        request(catalogUrl(which), readJson)
+    function loadCatalog() {
+        if (loadState === "loading" || loadState === "ready") return;
+        loadState = "loading";
+        renderResults();
+        request(LUCIDE_INDEX_URL, readJson)
             .then(function (data) {
-                catalog[which] = buildCatalog(which, data);
-                loadState[which] = "ready";
-                render();
+                buildCatalog(data);
+                loadState = "ready";
+                renderResults();
             })
             .catch(function () {
-                loadState[which] = "error";
-                render();
+                loadState = "error";
+                renderResults();
             });
     }
 
     function termScore(entry, term) {
         if (entry.search.indexOf(term) === -1) return -1;
-        if (entry.nameKey === term || entry.titleKey === term) return 0;
-        if (entry.nameKey.indexOf(term) === 0 || entry.titleKey.indexOf(term) === 0) return 1;
+        if (entry.nameKey === term) return 0;
+        if (entry.nameKey.indexOf(term) === 0) return 1;
         for (var i = 0; i < entry.words.length; i++) {
             if (entry.words[i].indexOf(term) === 0) return 2;
         }
-        if (entry.nameKey.indexOf(term) !== -1 || entry.titleKey.indexOf(term) !== -1) return 3;
+        if (entry.nameKey.indexOf(term) !== -1) return 3;
         return 4;
     }
 
     function filtered() {
-        var all = catalog[tab] || [];
-        if (tab === "emoji" && category !== ALL_CATEGORIES) {
-            all = all.filter(function (entry) {
-                return entry.category === category;
-            });
-        }
+        var all = category === null ? catalog : categoryEntries[category] || [];
         var terms = query.trim().toLowerCase().split(/\\s+/).filter(Boolean);
         if (terms.length === 0) return all;
         var scored = [];
@@ -988,7 +681,7 @@ main {
             scored.push({ entry: all[i], score: total });
         }
         scored.sort(function (a, b) {
-            return a.score - b.score || byTitle(a.entry, b.entry);
+            return a.score - b.score || byName(a.entry, b.entry);
         });
         return scored.map(function (item) {
             return item.entry;
@@ -1012,12 +705,12 @@ main {
     }
 
     function retryList() {
-        loadState[tab] = "idle";
-        loadCatalog(tab);
+        loadState = "idle";
+        loadCatalog();
     }
 
     function updateTileFailures() {
-        if (loadState[tab] !== "ready" || shown.length === 0) return;
+        if (loadState !== "ready" || shown.length === 0) return;
         if (resultsEl.querySelector(".tile.failed")) {
             setStatus("Some icons didn't load.", retryFailedTiles);
         } else {
@@ -1026,30 +719,15 @@ main {
     }
 
     function retryFailedTiles() {
-        var prefix = ICONIFY_PREFIXES[tab];
-        if (prefix) {
-            var stem = "iconify:" + prefix + ":";
-            Array.from(svgFailed).forEach(function (key) {
-                if (key.indexOf(stem) === 0) svgFailed.delete(key);
-            });
-        }
+        svgFailed.clear();
         statusEl.hidden = true;
         var tiles = resultsEl.querySelectorAll(".tile.failed");
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
-            if (svgFailed.has(keyOf(tile.iconRef))) continue;
             tile.classList.remove("failed");
             showSkeleton(tile);
             observer.observe(tile);
         }
-    }
-
-    function renderTabs() {
-        for (var i = 0; i < tabButtons.length; i++) {
-            var button = tabButtons[i];
-            button.className = button.dataset.tab === tab ? "tab active" : "tab";
-        }
-        searchEl.placeholder = PLACEHOLDERS[tab];
     }
 
     function isCustomColor(color) {
@@ -1063,55 +741,38 @@ main {
         for (var s = 0; s < strokeButtons.length; s++) {
             strokeButtons[s].classList.toggle("active", Number(strokeButtons[s].dataset.stroke) === options.stroke);
         }
-        strokesEl.hidden = tab !== "icons";
-        colorsEl.hidden = tab !== "icons" && tab !== "brands";
-        var colorsOff = tab === "brands" && options.brandColours;
-        colorsEl.classList.toggle("disabled", colorsOff);
         for (var c = 0; c < colorButtons.length; c++) {
-            colorButtons[c].disabled = colorsOff;
             colorButtons[c].classList.toggle("active", colorButtons[c].dataset.color === options.color);
         }
         var custom = isCustomColor(options.color);
-        customInput.disabled = colorsOff;
         customSwatch.classList.toggle("active", custom);
         customSwatch.style.background = custom ? options.color : "";
         if (custom) customInput.value = options.color;
-        brandWrap.hidden = tab !== "brands";
-        brandInput.checked = options.brandColours;
         labelInput.checked = options.label;
     }
 
+    function addChip(id, title) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip";
+        chip.textContent = title;
+        chip.categoryId = id;
+        chip.addEventListener("click", function () {
+            selectCategory(id);
+        });
+        chipsEl.appendChild(chip);
+    }
+
     function renderChips() {
-        var ready = tab === "emoji" && loadState.emoji === "ready";
-        chipsEl.hidden = !ready;
-        if (!ready) return;
         if (chipsEl.childElementCount === 0) {
-            var present = new Set(catalog.emoji.map(function (entry) {
-                return entry.category;
-            }));
-            var groups = [ALL_CATEGORIES].concat(EMOJI_CATEGORIES.filter(function (group) {
-                return present.has(group);
-            }));
-            groups.forEach(function (group) {
-                var chip = document.createElement("button");
-                chip.type = "button";
-                chip.className = "chip";
-                chip.textContent = group;
-                chip.dataset.category = group;
-                chip.addEventListener("click", function () {
-                    if (category === group) return;
-                    category = group;
-                    limit = PAGE_SIZE;
-                    mainEl.scrollTop = 0;
-                    renderChips();
-                    renderResults();
-                });
-                chipsEl.appendChild(chip);
-            });
+            addChip(null, "All");
+            for (var c = 0; c < CATEGORIES.length; c++) {
+                addChip(CATEGORIES[c].id, CATEGORIES[c].title);
+            }
         }
         for (var i = 0; i < chipsEl.children.length; i++) {
             var chip = chipsEl.children[i];
-            chip.classList.toggle("active", chip.dataset.category === category);
+            chip.classList.toggle("active", chip.categoryId === category);
         }
     }
 
@@ -1150,15 +811,11 @@ main {
         moreEl.hidden = true;
         shown = [];
 
-        if (loadState[tab] === "loading") {
-            setStatus("Loading…", null);
-            return;
-        }
-        if (loadState[tab] === "error") {
+        if (loadState === "error") {
             setStatus("Could not load the icon list. Check your connection.", retryList);
             return;
         }
-        if (loadState[tab] !== "ready") {
+        if (loadState !== "ready") {
             setStatus("Loading…", null);
             return;
         }
@@ -1175,20 +832,18 @@ main {
     }
 
     function render() {
-        renderTabs();
         renderOptions();
         renderChips();
         renderResults();
     }
 
-    function selectTab(next) {
-        if (tab === next) return;
-        tab = next;
+    function selectCategory(id) {
+        if (category === id) return;
+        category = id;
         limit = PAGE_SIZE;
         mainEl.scrollTop = 0;
-        render();
-        loadCatalog(tab);
-        persist();
+        renderChips();
+        renderResults();
     }
 
     function applyQuery() {
@@ -1203,12 +858,6 @@ main {
         renderOptions();
         persist();
     }
-
-    tabButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-            selectTab(button.dataset.tab);
-        });
-    });
 
     sizeButtons.forEach(function (button) {
         button.addEventListener("click", function () {
@@ -1230,10 +879,6 @@ main {
 
     customInput.addEventListener("input", function () {
         setOption("color", customInput.value);
-    });
-
-    brandInput.addEventListener("change", function () {
-        setOption("brandColours", brandInput.checked);
     });
 
     labelInput.addEventListener("change", function () {
@@ -1282,20 +927,19 @@ main {
             return;
         }
         if (raw.type !== "init") return;
-        tab = TABS.indexOf(raw.tab) === -1 ? "icons" : raw.tab;
         recent = Array.isArray(raw.recent) ? raw.recent : [];
         if (raw.options && typeof raw.options === "object") options = raw.options;
         limit = PAGE_SIZE;
         renderRecent();
         render();
-        loadCatalog(tab);
+        loadCatalog();
     });
 
     render();
     api.postMessage({ type: "ready" });
 
     setTimeout(function () {
-        loadCatalog(tab);
+        loadCatalog();
     }, 1500);
 })();
 </script>

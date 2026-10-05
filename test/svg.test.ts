@@ -4,15 +4,13 @@ import type { IconPick } from "../src/shared/messages";
 import { finalizeIconSvg, type SvgOptions } from "../src/svg";
 
 const LUCIDE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/></svg>`;
-const BRAND = `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Figma</title><path d="M0 0h24v24H0z"/></svg>`;
-const LOGO = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 153"><path fill="#f90" d="M0 0h256v153H0z"/></svg>`;
+const WIDE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 153" stroke="currentColor"><path d="M0 0h256v153H0z"/></svg>`;
 const HOSTILE = `<?xml version="1.0"?><!-- note --><svg viewBox="0 0 24 24" onload="alert(1)"><script>alert(2)</script><path onclick='steal()' d="M0 0h24"/></svg>`;
 
 const OPTIONS: SvgOptions = {
     size: 64,
     color: "#ff4d4d",
     stroke: 2,
-    brandColours: true,
 };
 
 const lucide: IconPick = {
@@ -20,19 +18,6 @@ const lucide: IconPick = {
     name: "minus",
     title: "minus",
     svg: LUCIDE,
-};
-const brand: IconPick = {
-    source: "brand",
-    name: "figma",
-    title: "Figma",
-    hex: "F24E1E",
-    svg: BRAND,
-};
-const logo: IconPick = {
-    source: "iconify",
-    name: "logos:aws",
-    title: "Aws",
-    svg: LOGO,
 };
 
 function finish(icon: IconPick, overrides: Partial<SvgOptions> = {}) {
@@ -50,24 +35,8 @@ test("a Lucide icon takes the colour and the stroke width", () => {
     assert.match(rootTag(svg), / stroke-width="2.75"/);
 });
 
-test("a brand logo keeps its colour with brand colours on", () => {
-    assert.match(rootTag(finish(brand).svg), / fill="#F24E1E"/);
-});
-
-test("a brand logo takes the colour with brand colours off", () => {
-    const { svg } = finish(brand, { brandColours: false });
-    assert.match(rootTag(svg), / fill="#ff4d4d"/);
-});
-
-test("an Iconify icon keeps its own colours", () => {
-    const { svg } = finish(logo);
-    assert.ok(!svg.includes("#ff4d4d"));
-    assert.ok(!/ fill=/.test(rootTag(svg)));
-    assert.match(svg, /<path fill="#f90"/);
-});
-
 test("a wide viewBox keeps its aspect on the board and stays crisp", () => {
-    const { svg, width, height } = finish(logo);
+    const { svg, width, height } = finish({ ...lucide, svg: WIDE });
     assert.equal(width, 64);
     assert.equal(height, 38.25);
     assert.match(rootTag(svg), / width="512"/);
@@ -82,7 +51,7 @@ test("an icon without a viewBox is treated as 24 by 24", () => {
 });
 
 test("scripts, event handlers, comments and the XML declaration are stripped", () => {
-    const { svg } = finish({ ...logo, svg: HOSTILE });
+    const { svg } = finish({ ...lucide, svg: HOSTILE });
     assert.ok(!/script/i.test(svg));
     assert.ok(!/\son[a-z]+\s*=/i.test(svg));
     assert.ok(!svg.includes("<!--"));

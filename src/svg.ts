@@ -1,10 +1,9 @@
-import type { IconPick, IconRef } from "./shared/messages";
+import type { IconPick } from "./shared/messages";
 
 export type SvgOptions = {
     size: number;
     color: string;
     stroke: number;
-    brandColours: boolean;
 };
 
 export type FinishedSvg = {
@@ -23,7 +22,6 @@ const DOCTYPE = /<!DOCTYPE[^>]*>/gi;
 const EVENT_HANDLER = /\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*')/gi;
 const ROOT_TAG = /<svg\b([^>]*)>/i;
 const ATTRIBUTE = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
-const HEX = /^[0-9a-fA-F]{3,8}$/;
 
 function parseAttributes(raw: string): Map<string, string> {
     const attributes = new Map<string, string>();
@@ -56,20 +54,6 @@ function parseViewBox(raw: string | undefined): [number, number] | null {
 }
 
 const round = (value: number): number => Math.round(value * 100) / 100;
-
-export function normalizeHex(hex: string | undefined): string | null {
-    if (typeof hex !== "string") return null;
-    const bare = hex.startsWith("#") ? hex.slice(1) : hex;
-    return HEX.test(bare) ? `#${bare}` : null;
-}
-
-export function isMonochrome(icon: IconRef, brandColours: boolean): boolean {
-    if (icon.source === "lucide") return true;
-    if (icon.source === "brand") {
-        return !brandColours || normalizeHex(icon.hex) === null;
-    }
-    return false;
-}
 
 export function finalizeIconSvg(
     icon: IconPick,
@@ -107,22 +91,13 @@ export function finalizeIconSvg(
         String(round((PIXEL_LONG_SIDE * boxHeight) / longSide))
     );
 
-    if (icon.source === "lucide") {
-        attributes.set("stroke-width", String(options.stroke));
-    }
-    if (icon.source === "brand") {
-        const brandColor = options.brandColours ? normalizeHex(icon.hex) : null;
-        attributes.set("fill", brandColor ?? options.color);
-    }
+    attributes.set("stroke-width", String(options.stroke));
 
     const body = cleaned.slice(root.index + root[0].length);
     const rebuilt = `<svg${serializeAttributes(attributes)}>${body}`;
 
     return {
-        svg:
-            icon.source === "lucide"
-                ? rebuilt.split("currentColor").join(options.color)
-                : rebuilt,
+        svg: rebuilt.split("currentColor").join(options.color),
         width: (options.size * boxWidth) / longSide,
         height: (options.size * boxHeight) / longSide,
     };

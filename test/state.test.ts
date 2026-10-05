@@ -5,13 +5,12 @@ import { readState } from "../src/index";
 const DEFAULT_OPTIONS = {
     size: 64,
     color: "ink",
-    brandColours: true,
     stroke: 2,
     label: false,
 };
 
 test("readState falls back to the defaults", () => {
-    const empty = { tab: "icons", recent: [], options: DEFAULT_OPTIONS };
+    const empty = { recent: [], options: DEFAULT_OPTIONS };
     assert.deepEqual(readState(undefined), empty);
     assert.deepEqual(readState({}), empty);
 });
@@ -20,37 +19,25 @@ test("readState keeps valid values", () => {
     const options = {
         size: 256,
         color: "#698CF9",
-        brandColours: false,
         stroke: 1.5,
         label: true,
     };
     const recent = [
-        {
-            source: "iconify",
-            name: "fluent-emoji-flat:rocket",
-            title: "Rocket",
-        },
-        { source: "brand", name: "figma", title: "Figma", hex: "F24E1E" },
+        { source: "lucide", name: "house", title: "house" },
+        { source: "lucide", name: "arrow-right", title: "arrow-right" },
     ];
-    assert.deepEqual(readState({ tab: "emoji", recent, options }), {
-        tab: "emoji",
-        recent,
-        options,
-    });
+    assert.deepEqual(readState({ recent, options }), { recent, options });
 });
 
-test("readState rejects a bad colour, size, stroke and tab", () => {
+test("readState rejects a bad colour, size and stroke", () => {
     const state = readState({
-        tab: "maps",
         options: {
             size: 100,
             color: "red",
-            brandColours: "yes",
             stroke: 3,
             label: "true",
         },
     });
-    assert.equal(state.tab, "icons");
     assert.deepEqual(state.options, DEFAULT_OPTIONS);
     assert.equal(
         readState({ options: { color: "#12345" } }).options.color,
@@ -58,20 +45,26 @@ test("readState rejects a bad colour, size, stroke and tab", () => {
     );
 });
 
-test("readState drops recent icons outside the three Iconify sets", () => {
-    const kept = {
-        source: "iconify",
-        name: "logos:aws-lambda",
-        title: "Aws lambda",
-    };
+test("readState drops recent icons that are not Lucide and keeps the rest", () => {
+    const kept = { source: "lucide", name: "house", title: "house" };
+    const alsoKept = { source: "lucide", name: "user", title: "user" };
     const state = readState({
+        tab: "brands",
         recent: [
-            { source: "iconify", name: "mdi:home", title: "Home" },
+            { source: "brand", name: "figma", title: "Figma", hex: "F24E1E" },
             kept,
-            { source: "iconify", name: "logos:AWS", title: "AWS" },
-            { source: "iconify", name: "circle-flags", title: "Flags" },
-            { source: "font", name: "logos:aws", title: "Aws" },
+            {
+                source: "iconify",
+                name: "fluent-emoji-flat:rocket",
+                title: "Rocket",
+            },
+            { source: "lucide", name: "", title: "empty" },
+            alsoKept,
         ],
+        options: { ...DEFAULT_OPTIONS, brandColours: false },
     });
-    assert.deepEqual(state.recent, [kept]);
+    assert.deepEqual(state, {
+        recent: [kept, alsoKept],
+        options: DEFAULT_OPTIONS,
+    });
 });

@@ -1,7 +1,7 @@
 {
     "name": "drawdy-icon-stencils",
     "version": "1.0.0",
-    "description": "Icon Stencils for Drawdy: search icons, logos, emoji and flags, then drag or click them onto the board.",
+    "description": "Icon Stencils for Drawdy: UI and wireframe line icons from Lucide, grouped by category, to drag or click onto the board.",
     "license": "MIT",
     "private": true,
     "type": "module",
@@ -10,7 +10,9 @@
         "build": "node build.ts",
         "test": "tsx --test test/*.test.ts",
         "typecheck": "tsc --noEmit",
-        "preflight": "node scripts/preflight.mjs"
+        "preflight": "node scripts/preflight.mjs",
+        "lucide-categories": "node scripts/lucide-categories.mjs",
+        "check-lucide-categories": "node scripts/lucide-categories.mjs --check"
     },
     "devDependencies": {
         "@drawdy/driver-protocol": "latest",

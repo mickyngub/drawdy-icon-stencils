@@ -2,7 +2,7 @@
     "driverId": "mickyngub.icon-stencils",
     "driverName": "Icon Stencils",
     "driverVersion": "1.0.0",
-    "description": "Drag icons, logos, emoji and flags straight onto the canvas. Search Lucide icons, Simple Icons brand logos, full-colour tech and cloud logos, Fluent emoji and round country flags, then drag one onto the board or click to add it in view, where repeated clicks line up in rows. Pick a size, a colour and stroke for single-colour icons, keep or drop brand colours, and add a name label. Icons keep their proportions and stay sharp when zoomed.",
+    "description": "UI and wireframe line icons from Lucide, grouped by category, straight onto the canvas. Pick a category such as Layout, Arrows, Text formatting or Devices, or search every icon, then drag one onto the board or click to add it in view, where repeated clicks line up in rows. Choose a size, a colour and a stroke width, and add a name label. Icons keep their proportions and stay sharp when zoomed.",
     "icon": "icon.svg",
     "main": "main.js",
     "permissions": [
