@@ -21,22 +21,22 @@ body {
     overflow: hidden;
 }
 header {
-    padding: 10px 12px 8px;
+    padding: 12px 12px 12px;
     border-bottom: 1px solid var(--drawdy-border, #e5e5e5);
     flex: none;
 }
 .hint {
     font-size: 11px;
     color: var(--drawdy-muted-foreground, #888);
-    margin: 0 0 8px;
+    margin: 0 0 12px;
     line-height: 1.45;
 }
 .options {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 10px;
-    margin: 0 0 8px;
+    gap: 10px 12px;
+    margin: 0 0 12px;
 }
 .seg {
     display: inline-flex;
@@ -66,7 +66,7 @@ header {
 .swatches {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 .swatch {
     position: relative;
@@ -101,7 +101,7 @@ header {
 .check {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-size: 11px;
     color: var(--drawdy-muted-foreground, #888);
     cursor: pointer;
@@ -125,9 +125,9 @@ header {
 #search:focus { border-color: var(--drawdy-ring, var(--drawdy-primary, #6366f1)); }
 .chips {
     display: flex;
-    gap: 4px;
-    margin: 0 0 8px;
-    padding: 0 0 2px;
+    gap: 6px;
+    margin: 0 0 4px;
+    padding: 0 0 4px;
     overflow-x: auto;
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
