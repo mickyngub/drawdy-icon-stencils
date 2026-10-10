@@ -19,7 +19,7 @@ Every [Lucide](https://lucide.dev) line icon, one drag away from your Drawdy boa
 
 - **Size**: S, M, L or XL, from 32 to 256 board units.
 - **Line weight**: Thin, Regular or Bold.
-- **Label**: also add the icon's name under it.
+- **Label**: also add the icon's name, centred under it and grouped with the icon so they move together.
 - **Colour**: Ink (the board's foreground colour), four Drawdy colours, or any colour you pick.
 
 ## Tips
