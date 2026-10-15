@@ -2,6 +2,8 @@
 
 Every [Lucide](https://lucide.dev) line icon, one drag away from your Drawdy board. Use them to wireframe screens, sketch interfaces and make diagrams readable at a glance.
 
+![Searching Icon Stencils for menu, search and user icons and dragging them into a phone inbox wireframe on a Drawdy board](https://raw.githubusercontent.com/mickyngub/drawdy-icon-stencils/main/docs/media/icon-stencils.gif)
+
 ## What it's for
 
 - **Wireframes and UI sketches**: menus, arrows, text formatting, devices, file types, accounts and more, all in one consistent line style.

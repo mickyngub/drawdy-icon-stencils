@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- a short GIF on the listing page that shows searching for icons and dragging them into a wireframe in action
+
 ## 1.0.2
 
 - a label sits centred under its icon, and an icon with a label is placed as one group, so the two move together
