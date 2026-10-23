@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4
+
+- the panel now uses Drawdy's own colours and font and matches the other icon pickers
+- category chips scroll with a fade instead of being cut off, and selected options are grey instead of lime
+
 ## 1.0.3
 
 - a short GIF on the listing page that shows searching for icons and dragging them into a wireframe in action
