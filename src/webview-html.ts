@@ -1,323 +1,80 @@
 import { LUCIDE_CATEGORIES } from "./lucide-categories";
+import { PANEL_CSS } from "./panel-css";
 import { LUCIDE_ICON_BASE, LUCIDE_INDEX_URL } from "./sources";
+
+const FOCUS =
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const SECONDARY = `inline-flex h-7.5 cursor-pointer items-center justify-center gap-1 rounded-lg border border-line bg-subtle px-2.5 text-label text-fg-muted transition-colors hover:bg-hover hover:text-fg active:bg-pressed ${FOCUS}`;
+const TILE = `grid aspect-square cursor-grab touch-none place-items-center overflow-hidden rounded-lg bg-subtle p-0 text-fg transition-colors select-none hover:bg-hover active:cursor-grabbing active:bg-pressed data-[dragging=true]:opacity-35 [&_svg]:block [&_svg]:size-6 ${FOCUS}`;
+const SKELETON = "size-5 animate-pulse rounded-sm bg-control-subtle";
+const BROKEN = "size-5 rounded-sm border border-dashed border-line-strong";
+const GHOST =
+    "pointer-events-none fixed top-0 left-0 z-10 grid size-[34px] translate-x-(--gx) translate-y-(--gy) place-items-center rounded-lg bg-elevated text-fg opacity-90 shadow-md ring-1 ring-line-strong [&_svg]:block [&_svg]:size-5";
+const CHIP = `h-7 shrink-0 cursor-pointer rounded-full border border-line px-3 text-label whitespace-nowrap text-fg-muted transition-colors hover:bg-hover hover:text-fg aria-pressed:border-transparent aria-pressed:bg-accent-subtle aria-pressed:text-accent-text ${FOCUS}`;
+const RETRY = `mt-2 ${SECONDARY}`;
+const SECTION_LABEL =
+    "flex items-center justify-between text-label text-fg-muted";
+const GRID = "grid grid-cols-6 gap-1";
+const TRACK = "flex h-7 gap-0.5 rounded-lg bg-control-subtle p-0.5";
+const SEGMENT = `cursor-pointer truncate rounded-md px-1.5 text-label text-fg-subtle transition-colors hover:text-fg aria-pressed:bg-control aria-pressed:text-fg ${FOCUS}`;
+const SWATCH_BASE =
+    "relative size-5 shrink-0 cursor-pointer overflow-hidden rounded-full ring-1 ring-black/10 ring-inset";
+const SWATCH = `${SWATCH_BASE} aria-pressed:outline-2 aria-pressed:outline-offset-2 aria-pressed:outline-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`;
+const CUSTOM_SWATCH = `${SWATCH_BASE} bg-[conic-gradient(#ff4d4d,#ffab3c,#b3e000,#3cc7ff,#698CF9,#c45cff,#ff4d4d)] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring data-[active=true]:bg-(--swatch) data-[active=true]:bg-none data-[active=true]:outline-2 data-[active=true]:outline-offset-2 data-[active=true]:outline-fg`;
 
 export const WEBVIEW_HTML = `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/google-sans-flex@5.3.2/wght.css" />
 <style id="theme">:root{/*__DRAWDY_STYLING__*/}</style>
-<style>
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-html, body { margin: 0; height: 100%; }
-body {
-    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-    background: var(--drawdy-background, #fff);
-    color: var(--drawdy-foreground, #111);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-}
-header {
-    padding: 12px 12px 12px;
-    border-bottom: 1px solid var(--drawdy-border, #e5e5e5);
-    flex: none;
-}
-.hint {
-    font-size: 11px;
-    color: var(--drawdy-muted-foreground, #888);
-    margin: 0 0 12px;
-    line-height: 1.45;
-}
-.options {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 12px;
-    margin: 0 0 12px;
-}
-.seg {
-    display: inline-flex;
-    gap: 2px;
-    padding: 2px;
-    background: var(--drawdy-surface, #f4f4f4);
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: var(--drawdy-radius-sm, 6px);
-}
-.seg button {
-    padding: 2px 7px;
-    font: inherit;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--drawdy-muted-foreground, #888);
-    background: transparent;
-    border: 0;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.seg button:hover { color: var(--drawdy-foreground, #111); }
-.seg button.active {
-    background: var(--drawdy-background, #fff);
-    color: var(--drawdy-foreground, #111);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-}
-.swatches {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-.swatch {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: 50%;
-    background: var(--swatch, transparent);
-    cursor: pointer;
-    overflow: hidden;
-}
-.swatch.ink { background: var(--drawdy-foreground, #111); }
-.swatch.custom {
-    display: inline-block;
-    background: conic-gradient(#ff4d4d, #ffab3c, #b3e000, #3cc7ff, #698CF9, #c45cff, #ff4d4d);
-}
-.swatch.active {
-    box-shadow: 0 0 0 2px var(--drawdy-background, #fff), 0 0 0 3.5px var(--drawdy-ring, var(--drawdy-primary, #6366f1));
-}
-.swatch input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    opacity: 0;
-    cursor: pointer;
-}
-.check {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--drawdy-muted-foreground, #888);
-    cursor: pointer;
-    user-select: none;
-}
-.check input {
-    margin: 0;
-    accent-color: var(--drawdy-primary, #6366f1);
-}
-#search {
-    width: 100%;
-    padding: 7px 10px;
-    font-size: 13px;
-    font-family: inherit;
-    color: var(--drawdy-foreground, #111);
-    background: var(--drawdy-input, var(--drawdy-surface, #f4f4f4));
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: var(--drawdy-radius-md, 8px);
-    outline: none;
-}
-#search:focus { border-color: var(--drawdy-ring, var(--drawdy-primary, #6366f1)); }
-.chips {
-    display: flex;
-    gap: 6px;
-    margin: 0 0 4px;
-    padding: 0 0 4px;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-}
-.chips.scrolling { scrollbar-color: var(--drawdy-muted-foreground, #888) transparent; }
-.chips::-webkit-scrollbar { height: 4px; }
-.chips::-webkit-scrollbar-track { background: transparent; }
-.chips::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
-.chips.scrolling::-webkit-scrollbar-thumb { background: var(--drawdy-muted-foreground, #888); }
-.chip {
-    flex: none;
-    padding: 3px 9px;
-    font: inherit;
-    font-size: 11px;
-    color: var(--drawdy-muted-foreground, #888);
-    background: transparent;
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: 999px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-.chip:hover { color: var(--drawdy-foreground, #111); }
-.chip.active {
-    color: var(--drawdy-primary-foreground, #fff);
-    background: var(--drawdy-primary, #6366f1);
-    border-color: transparent;
-}
-.recent-wrap {
-    flex: none;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--drawdy-border, #e5e5e5);
-}
-main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 12px 20px;
-}
-.section-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--drawdy-muted-foreground, #888);
-    margin: 0 0 6px;
-}
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-    gap: 6px;
-}
-.tile {
-    aspect-ratio: 1;
-    padding: 0;
-    margin: 0;
-    font: inherit;
-    color: inherit;
-    appearance: none;
-    -webkit-appearance: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-    overflow: hidden;
-    background: var(--drawdy-surface, #f4f4f4);
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: var(--drawdy-radius-md, 8px);
-    transition: background 0.08s, border-color 0.08s, transform 0.08s;
-}
-.tile:hover {
-    background: var(--drawdy-surface2, var(--drawdy-surface, #ececec));
-    border-color: var(--drawdy-primary, #6366f1);
-}
-.tile:active { cursor: grabbing; transform: scale(0.94); }
-.tile:focus-visible { outline: 2px solid var(--drawdy-ring, #6366f1); outline-offset: 1px; }
-.tile.dragging { opacity: 0.35; }
-.tile svg { width: 22px; height: 22px; display: block; }
-.skeleton {
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    background: var(--drawdy-border, #e5e5e5);
-    opacity: 0.55;
-    animation: pulse 1.1s ease-in-out infinite;
-}
-@keyframes pulse {
-    0%, 100% { opacity: 0.25; }
-    50% { opacity: 0.7; }
-}
-.broken {
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    border: 1px dashed var(--drawdy-border, #e5e5e5);
-}
-.status {
-    font-size: 12px;
-    color: var(--drawdy-muted-foreground, #888);
-    padding: 20px 0;
-    text-align: center;
-    line-height: 1.5;
-}
-.retry {
-    margin-top: 10px;
-    padding: 5px 12px;
-    font: inherit;
-    font-size: 12px;
-    color: var(--drawdy-primary-foreground, #fff);
-    background: var(--drawdy-primary, #6366f1);
-    border: 0;
-    border-radius: var(--drawdy-radius-md, 8px);
-    cursor: pointer;
-}
-.count {
-    font-size: 10px;
-    color: var(--drawdy-muted-foreground, #888);
-    padding: 10px 0 0;
-    text-align: center;
-}
-.more {
-    display: block;
-    margin: 8px auto 0;
-    padding: 5px 12px;
-    font: inherit;
-    font-size: 12px;
-    color: var(--drawdy-foreground, #111);
-    background: var(--drawdy-surface, #f4f4f4);
-    border: 1px solid var(--drawdy-border, #e5e5e5);
-    border-radius: var(--drawdy-radius-md, 8px);
-    cursor: pointer;
-}
-.more:hover { border-color: var(--drawdy-primary, #6366f1); }
-.ghost {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 10;
-    background: var(--drawdy-surface, #f4f4f4);
-    border: 1px solid var(--drawdy-primary, #6366f1);
-    border-radius: var(--drawdy-radius-md, 8px);
-    opacity: 0.9;
-}
-.ghost svg { width: 20px; height: 20px; display: block; }
-</style>
+<style>${PANEL_CSS}</style>
 </head>
-<body>
-<header>
-    <p class="hint">Drag an icon onto the board, or click to add it at the centre.</p>
-    <div class="options">
-        <div class="seg" id="sizes" title="Size on the board">
-            <button type="button" data-size="32" title="32 px">S</button>
-            <button type="button" data-size="64" title="64 px">M</button>
-            <button type="button" data-size="128" title="128 px">L</button>
-            <button type="button" data-size="256" title="256 px">XL</button>
+<body class="flex h-screen flex-col overflow-hidden bg-panel font-sans text-body text-fg antialiased">
+<header class="flex flex-none flex-col gap-1.5 px-4 pt-3 pb-1">
+    <p class="text-body text-fg-subtle">Drag an icon onto the board, or click to add it.</p>
+    <div id="chips" class="-mx-4 flex scroll-pr-8 scroll-pl-4 gap-1.5 overflow-x-auto pr-8 pl-4 [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-32px),transparent)] [scrollbar-width:none]"></div>
+    <div class="grid grid-cols-[4fr_5fr] gap-2">
+        <div class="${TRACK}" id="sizes" title="Size on the board" role="group" aria-label="Size on the board">
+            <button type="button" class="${SEGMENT} flex-1" data-size="32" title="32 px">S</button>
+            <button type="button" class="${SEGMENT} flex-1" data-size="64" title="64 px">M</button>
+            <button type="button" class="${SEGMENT} flex-1" data-size="128" title="128 px">L</button>
+            <button type="button" class="${SEGMENT} flex-1" data-size="256" title="256 px">XL</button>
         </div>
-        <div class="seg" id="strokes" title="Stroke">
-            <button type="button" data-stroke="1.5">Thin</button>
-            <button type="button" data-stroke="2">Regular</button>
-            <button type="button" data-stroke="2.75">Bold</button>
-        </div>
-        <label class="check"><input type="checkbox" id="label" /> Label</label>
-        <div class="swatches" id="colors">
-            <button type="button" class="swatch ink" data-color="ink" title="Ink" aria-label="Ink"></button>
-            <button type="button" class="swatch" data-color="#b3e000" style="--swatch: #b3e000" title="#b3e000" aria-label="#b3e000"></button>
-            <button type="button" class="swatch" data-color="#ffab3c" style="--swatch: #ffab3c" title="#ffab3c" aria-label="#ffab3c"></button>
-            <button type="button" class="swatch" data-color="#698CF9" style="--swatch: #698CF9" title="#698CF9" aria-label="#698CF9"></button>
-            <button type="button" class="swatch" data-color="#ff4d4d" style="--swatch: #ff4d4d" title="#ff4d4d" aria-label="#ff4d4d"></button>
-            <label class="swatch custom" id="custom-swatch" title="Custom colour"><input type="color" id="custom-color" value="#000000" aria-label="Custom colour" /></label>
+        <div class="${TRACK}" id="strokes" title="Stroke" role="group" aria-label="Stroke">
+            <button type="button" class="${SEGMENT} flex-auto" data-stroke="1.5">Thin</button>
+            <button type="button" class="${SEGMENT} flex-auto" data-stroke="2">Regular</button>
+            <button type="button" class="${SEGMENT} flex-auto" data-stroke="2.75">Bold</button>
         </div>
     </div>
-    <div class="chips" id="chips"></div>
-    <input id="search" type="text" placeholder="Search icons (home, arrow…)" autocomplete="off" />
+    <div class="flex min-h-5 items-center justify-between gap-3">
+        <div class="flex items-center gap-2" id="colors" role="group" aria-label="Colour">
+            <button type="button" class="${SWATCH} bg-fg" data-color="ink" title="Ink" aria-label="Ink"></button>
+            <button type="button" class="${SWATCH} bg-[#b3e000]" data-color="#b3e000" title="#b3e000" aria-label="#b3e000"></button>
+            <button type="button" class="${SWATCH} bg-[#ffab3c]" data-color="#ffab3c" title="#ffab3c" aria-label="#ffab3c"></button>
+            <button type="button" class="${SWATCH} bg-[#698CF9]" data-color="#698CF9" title="#698CF9" aria-label="#698CF9"></button>
+            <button type="button" class="${SWATCH} bg-[#ff4d4d]" data-color="#ff4d4d" title="#ff4d4d" aria-label="#ff4d4d"></button>
+            <label class="${CUSTOM_SWATCH}" id="custom-swatch" title="Custom colour"><input type="color" id="custom-color" value="#000000" aria-label="Custom colour" class="absolute inset-0 size-full cursor-pointer border-0 p-0 opacity-0" /></label>
+        </div>
+        <label class="ml-auto inline-flex cursor-pointer items-center gap-2 text-label text-fg-muted select-none"><span class="grid place-items-center"><input type="checkbox" id="label" class="peer col-start-1 row-start-1 m-0 size-4 cursor-pointer appearance-none rounded-sm border border-line-strong transition-colors checked:border-transparent checked:bg-accent-pressed ${FOCUS}" /><svg class="pointer-events-none invisible col-start-1 row-start-1 size-3 text-on-accent peer-checked:visible" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></svg></span>Label</label>
+    </div>
+    <div class="relative">
+        <svg class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-fg-subtle" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"/></svg>
+        <input id="search" type="text" placeholder="Search icons (home, arrow…)" autocomplete="off" class="h-8 w-full rounded-lg border border-line bg-subtle px-3 pl-9 text-[13px] leading-5 text-fg transition-colors placeholder:text-fg-disabled hover:bg-hover focus:border-line-strong focus:bg-active focus:ring-1 focus:ring-ring focus:outline-none" />
+    </div>
 </header>
-<div class="recent-wrap" id="recent-wrap" hidden>
-    <div class="section-label">Recent</div>
-    <div class="grid" id="recent"></div>
-</div>
-<main id="main">
-    <div class="status" id="status" hidden></div>
-    <div class="grid" id="results"></div>
-    <div class="count" id="count" hidden></div>
-    <button class="more" id="more" type="button" hidden>Show more</button>
+<main id="main" class="min-h-0 flex-1 overflow-y-auto px-4 pt-1 pb-4 [scrollbar-color:var(--color-line-strong)_transparent] [scrollbar-width:thin]">
+    <div id="recent-wrap" class="mb-3 flex flex-col gap-2 border-b border-divider pb-3" hidden>
+        <div class="${SECTION_LABEL}">Recent</div>
+        <div class="${GRID}" id="recent"></div>
+    </div>
+    <div class="py-5 text-center text-body text-fg-subtle" id="status" hidden></div>
+    <div class="${GRID}" id="results"></div>
+    <div class="pt-3 text-center text-caption text-fg-subtle" id="count" hidden></div>
+    <div class="flex justify-center"><button class="${SECONDARY} mt-2" id="more" type="button" hidden>Show more</button></div>
 </main>
+<footer class="flex-none border-t border-divider px-4 py-2 text-caption text-fg-subtle">Icons by Lucide, ISC</footer>
 <script>
 (function () {
     var api = acquireDrawdyApi();
@@ -325,6 +82,12 @@ main {
     var LUCIDE_INDEX_URL = "${LUCIDE_INDEX_URL}";
     var LUCIDE_ICON_BASE = "${LUCIDE_ICON_BASE}";
     var CATEGORIES = ${JSON.stringify(LUCIDE_CATEGORIES)};
+    var TILE = ${JSON.stringify(TILE)};
+    var SKELETON = ${JSON.stringify(SKELETON)};
+    var BROKEN = ${JSON.stringify(BROKEN)};
+    var GHOST = ${JSON.stringify(GHOST)};
+    var CHIP = ${JSON.stringify(CHIP)};
+    var RETRY = ${JSON.stringify(RETRY)};
 
     var PRESET_COLORS = ["#b3e000", "#ffab3c", "#698CF9", "#ff4d4d"];
     var PAGE_SIZE = 120;
@@ -357,15 +120,6 @@ main {
     var recentWrap = document.getElementById("recent-wrap");
     var searchEl = document.getElementById("search");
     var chipsEl = document.getElementById("chips");
-    var chipsScrollTimer = null;
-    chipsEl.addEventListener("scroll", function () {
-        chipsEl.classList.add("scrolling");
-        if (chipsScrollTimer !== null) clearTimeout(chipsScrollTimer);
-        chipsScrollTimer = setTimeout(function () {
-            chipsEl.classList.remove("scrolling");
-            chipsScrollTimer = null;
-        }, 800);
-    });
     chipsEl.addEventListener(
         "wheel",
         function (event) {
@@ -473,22 +227,22 @@ main {
 
     function markFailed(tile) {
         tile.innerHTML = "";
-        tile.classList.add("failed");
+        tile.dataset.failed = "true";
         var broken = document.createElement("div");
-        broken.className = "broken";
+        broken.className = BROKEN;
         tile.appendChild(broken);
     }
 
     function showSkeleton(tile) {
         tile.innerHTML = "";
         var skeleton = document.createElement("div");
-        skeleton.className = "skeleton";
+        skeleton.className = SKELETON;
         tile.appendChild(skeleton);
     }
 
     function makeGhost(icon) {
         var ghost = document.createElement("div");
-        ghost.className = "ghost";
+        ghost.className = GHOST;
         document.body.appendChild(ghost);
         var cached = svgCache.get(keyOf(icon));
         if (cached) paintSvg(ghost, cached);
@@ -496,8 +250,8 @@ main {
     }
 
     function moveGhost(ghost, x, y) {
-        ghost.style.transform =
-            "translate(" + (x - 17) + "px, " + (y - 17) + "px)";
+        ghost.style.setProperty("--gx", x - 17 + "px");
+        ghost.style.setProperty("--gy", y - 17 + "px");
     }
 
     function useIcon(icon) {
@@ -545,7 +299,7 @@ main {
     function makeTile(icon, eager) {
         var tile = document.createElement("button");
         tile.type = "button";
-        tile.className = "tile";
+        tile.className = TILE;
         tile.title = icon.title;
         tile.setAttribute("aria-label", icon.title);
         tile.iconRef = icon;
@@ -585,7 +339,7 @@ main {
                 var dy = event.clientY - startY;
                 if (dx * dx + dy * dy < DRAG_THRESHOLD * DRAG_THRESHOLD) return;
                 dragging = true;
-                tile.classList.add("dragging");
+                tile.dataset.dragging = "true";
                 ghost = makeGhost(icon);
             }
             if (ghost) moveGhost(ghost, event.clientX, event.clientY);
@@ -595,7 +349,7 @@ main {
             if (tile.hasPointerCapture(event.pointerId)) {
                 tile.releasePointerCapture(event.pointerId);
             }
-            tile.classList.remove("dragging");
+            tile.dataset.dragging = "false";
             if (ghost) {
                 ghost.remove();
                 ghost = null;
@@ -721,7 +475,7 @@ main {
         statusEl.appendChild(line);
         if (onRetry) {
             var button = document.createElement("button");
-            button.className = "retry";
+            button.className = RETRY;
             button.type = "button";
             button.textContent = "Retry";
             button.addEventListener("click", onRetry);
@@ -736,7 +490,7 @@ main {
 
     function updateTileFailures() {
         if (loadState !== "ready" || shown.length === 0) return;
-        if (resultsEl.querySelector(".tile.failed")) {
+        if (resultsEl.querySelector("[data-failed]")) {
             setStatus("Some icons didn't load.", retryFailedTiles);
         } else {
             statusEl.hidden = true;
@@ -746,10 +500,10 @@ main {
     function retryFailedTiles() {
         svgFailed.clear();
         statusEl.hidden = true;
-        var tiles = resultsEl.querySelectorAll(".tile.failed");
+        var tiles = resultsEl.querySelectorAll("[data-failed]");
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
-            tile.classList.remove("failed");
+            delete tile.dataset.failed;
             showSkeleton(tile);
             observer.observe(tile);
         }
@@ -761,25 +515,27 @@ main {
 
     function renderOptions() {
         for (var i = 0; i < sizeButtons.length; i++) {
-            sizeButtons[i].classList.toggle("active", Number(sizeButtons[i].dataset.size) === options.size);
+            sizeButtons[i].setAttribute("aria-pressed", String(Number(sizeButtons[i].dataset.size) === options.size));
         }
         for (var s = 0; s < strokeButtons.length; s++) {
-            strokeButtons[s].classList.toggle("active", Number(strokeButtons[s].dataset.stroke) === options.stroke);
+            strokeButtons[s].setAttribute("aria-pressed", String(Number(strokeButtons[s].dataset.stroke) === options.stroke));
         }
         for (var c = 0; c < colorButtons.length; c++) {
-            colorButtons[c].classList.toggle("active", colorButtons[c].dataset.color === options.color);
+            colorButtons[c].setAttribute("aria-pressed", String(colorButtons[c].dataset.color === options.color));
         }
         var custom = isCustomColor(options.color);
-        customSwatch.classList.toggle("active", custom);
-        customSwatch.style.background = custom ? options.color : "";
-        if (custom) customInput.value = options.color;
+        customSwatch.dataset.active = String(custom);
+        if (custom) {
+            customSwatch.style.setProperty("--swatch", options.color);
+            customInput.value = options.color;
+        }
         labelInput.checked = options.label;
     }
 
     function addChip(id, title) {
         var chip = document.createElement("button");
         chip.type = "button";
-        chip.className = "chip";
+        chip.className = CHIP;
         chip.textContent = title;
         chip.categoryId = id;
         chip.addEventListener("click", function () {
@@ -797,7 +553,9 @@ main {
         }
         for (var i = 0; i < chipsEl.children.length; i++) {
             var chip = chipsEl.children[i];
-            chip.classList.toggle("active", chip.categoryId === category);
+            var selected = chip.categoryId === category;
+            chip.setAttribute("aria-pressed", String(selected));
+            if (selected) chip.scrollIntoView({ inline: "nearest", block: "nearest" });
         }
     }
 
